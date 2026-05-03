@@ -1,277 +1,263 @@
 # e-commerce-logistics
-E-Commerce Logistics Network Optimization using Python and NetworkX
 E-Commerce Logistics Network Optimization
 # 1. Real-World Problem Context
-Problem Tanımı
-Türkiye'de faaliyet gösteren bir e-ticaret şirketi, depo merkezlerini verimli bir şekilde bağlamak istemektedir. Şu anda 9 ana depo merkezi vardır ve bu merkezler arasında kargo dağıtımı yapılmaktadır.
-Maliyet Sorunu:
 
-Her bağlantının farklı maliyeti vardır
-Tüm merkezleri bağlamak için gereksiz maliyetler yapılmaktadır
-Kargo dağıtım rotaları optimal değildir
+Problem Definition
+An e-commerce company operating in Turkey wants to efficiently connect its warehouse centers. Currently, there are 9 main warehouse centers, and cargo distribution is carried out between these centers.
 
-Çözüm Aranıyor:
+Cost Challenge:
+Each connection has different costs
+Unnecessary costs are incurred to connect all centers
+Cargo distribution routes are not optimal
 
-En düşük maliyetle tüm merkezleri bağlamak
-İki merkez arasındaki en kısa mesafeyi bulma
-Ağ yapısını optimize ederek işletme maliyetlerini düşürme
+Solutions Needed:
+Connect all centers with minimum cost
+Find the shortest distance between two centers
+Optimize network structure to reduce operational costs
 
 
-# 2. Problem Definition (Detaylı)
-Mevcut Durum
+# 2. Problem Definition (Detailed)
+Current Situation
+Warehouse Centers: Istanbul, Ankara, Izmir, Bursa, Kayseri, Gaziantep, Diyarbakir, Antalya
+Number of Routes: 10 routes
+Total Network Cost: ₺22,800 (all connections)
 
-Depo Merkezleri: İstanbul, Ankara, İzmir, Bursa, Kayseri, Gaziantep, Diyarbakır, Antalya
-Bağlantı Sayısı: 10 rota
-Toplam Ağ Maliyeti: ₺22,450 (tüm bağlantılar)
-
-Optimizasyon Hedefleri
-
-Maliyet Minimizasyonu: Minimum Spanning Tree algoritması ile
-Rota Optimizasyonu: En kısa yol algoritması ile
-Ağ Verimliliği: Merkez önemlilik analizi ile
+Optimization Objectives
+Cost Minimization: Using Minimum Spanning Tree algorithm
+Route Optimization: Using Shortest Path algorithm
+Network Efficiency: Using centrality analysis
 
 
 # 3. Network Model
-Ağ Türü
+Network Type
+Undirected Graph: Cargo can be transported in both directions
+Weighted Graph: Each connection has different weights (cost, distance, capacity)
 
-Yönsüz Graf (Undirected Graph): Kargo her iki yönde de taşınabiliyor
-Ağırlıklı Graf: Her bağlantının farklı ağırlıkları var (maliyet, mesafe, kapasite)
-
-Düğümler (Nodes) - Depo Merkezleri
-1. İstanbul      (Hub - En önemli merkez)
-2. Ankara        (Bölge merkezi)
-3. İzmir         (Batı bölgesi)
-4. Bursa         (Kuzeybatı)
-5. Kayseri       (İç Anadolu)
-6. Gaziantep     (Güneydoğu)
-7. Diyarbakır    (Doğu)
-8. Antalya       (Akdeniz)
-Kenarlar (Edges) - Bağlantılar ve Ağırlıklar
-KaynakHedefMesafe (km)Maliyet (₺)Kapasite (paket/gün)İstanbulAnkara4502,250500İstanbulİzmir5602,800400AnkaraGaziantep6503,250350AnkaraKayseri3201,600450İzmirAntalya4802,400300GaziantepDiyarbakır3801,900280KayseriDiyarbakır5202,600350Antalyaİstanbul6003,000350İstanbulBursa2401,200550BursaAnkara3601,800400
+Nodes (Vertices) - Warehouse Centers
+1. Istanbul       (Hub - Most important center)
+2. Ankara         (Regional center)
+3. Izmir          (Western region)
+4. Bursa          (Northwest)
+5. Kayseri        (Central Anatolia)
+6. Gaziantep      (Southeast)
+7. Diyarbakir     (East)
+8. Antalya        (Mediterranean)
+Edges (Connections) and Weights
+SourceTargetDistance (km)Cost (₺)Capacity (packages/day)IstanbulAnkara4502,250500IstanbulIzmir5602,800400AnkaraGaziantep6503,250350AnkaraKayseri3201,600450IzmirAntalya4802,400300GaziantepDiyarbakir3801,900280KayseriDiyarbakir5202,600350AntalyaIstanbul6003,000350IstanbulBursa2401,200550BursaAnkara3601,800400
 
 # 4. Nodes and Edges
-Ağ Özellikleri
 
-Düğüm Sayısı: 8
-Kenar Sayısı: 10
-Ağ Bağlılığı: Tam bağlı (Connected)
-Grafik Türü: Undirected Weighted Graph
+Network Properties
+Number of Nodes: 8
+Number of Edges: 10
+Network Connectivity: Fully connected
+Graph Type: Undirected Weighted Graph
 
-Bağlantı Analizi
-En Düşük Maliyetli Bağlantı: İstanbul-Bursa (₺1,200)
-En Yüksek Maliyetli Bağlantı: Ankara-Gaziantep (₺3,250)
-En Kısa Mesafe: İstanbul-Bursa (240 km)
-En Uzun Mesafe: Ankara-Gaziantep (650 km)
+Connection Analysis
+Minimum Cost Connection: Istanbul-Bursa (₺1,200)
+Maximum Cost Connection: Ankara-Gaziantep (₺3,250)
+Shortest Distance: Istanbul-Bursa (240 km)
+Longest Distance: Ankara-Gaziantep (650 km)
 
 # 5. Selected Algorithm: Minimum Spanning Tree (Kruskal)
-Algoritma Seçimi Nedeni
-MST algoritması seçildi çünkü:
 
-Maliyet minimizasyonu için en uygun
-Tüm depo merkezlerini en az maliyetle bağlar
-Gereksiz bağlantıları elimine eder
-Operasyonel maliyetleri düşürür
+Why MST Algorithm?
+MST algorithm was selected because:
+Most suitable for cost minimization
+Connects all warehouse centers with minimum cost
+Eliminates unnecessary connections
+Reduces operational costs
 
-Kruskal Algoritması Nasıl Çalışır?
+How Kruskal's Algorithm Works
+Sort all edges by cost (smallest to largest)
+Add edges to the network in order
+Select edges that do not create cycles
+Continue until all nodes are connected
 
-Tüm kenarları maliyete göre sırala (küçükten büyüğe)
-Kenarları sırasıyla ağa ekle
-Döngü oluşturmayan kenarları seç
-Tüm düğümler bağlanana kadar devam et
+Results
+Optimal Network (MST):
 
-Sonuçlar
-Optimal Ağ (MST):
-
-İstanbul → Bursa (₺1,200)
+Istanbul → Bursa (₺1,200)
 Bursa → Ankara (₺1,800)
 Ankara → Kayseri (₺1,600)
-Gaziantep → Diyarbakır (₺1,900)
-Kayseri → Diyarbakır (₺2,600)
-İzmir → Antalya (₺2,400)
-İstanbul → Ankara (₺2,250)
+Gaziantep → Diyarbakir (₺1,900)
+Kayseri → Diyarbakir (₺2,600)
+Izmir → Antalya (₺2,400)
+Istanbul → Ankara (₺2,250)
 
-Toplam Maliyet: ₺13,850
-Tasarruf: ₺22,450 - ₺13,850 = ₺8,600 (%38,3 tasarruf!)
+Total Cost: ₺14,300
+Savings: ₺22,800 - ₺14,300 = ₺8,500 (37.3% cost reduction!)
 
 # 6. Python Implementation
-Kullanılan Kütüphaneler
+Libraries Used
 
-NetworkX: Ağ analizi ve algoritmaları
-Pandas: Veri yönetimi
-Matplotlib: Görselleştirme
+NetworkX: Network analysis and algorithms
+Pandas: Data management
+Matplotlib: Visualization
 
-Ana Adımlar
-python1. Veri yükleme (CSV'den)
-2. Ağ oluşturma
-3. Minimum Spanning Tree hesaplama
-4. En kısa yol bulma
-5. Ağ istatistikleri
-6. Görselleştirme
-Kodun Temel Yapısı
-python# Kütüphaneleri içe aktar
+Main Steps
+python1. Data loading (from CSV)
+2. Network creation
+3. Minimum Spanning Tree calculation
+4. Shortest path finding
+5. Network statistics
+6. Visualization
+Core Code Structure
+python# Import libraries
 import networkx as nx
 import pandas as pd
 
-# Veri yükle
+# Load data
 df = pd.read_csv('network_data.csv')
 
-# Ağ oluştur
+# Create network
 G = nx.Graph()
-# Düğümleri ve kenarları ekle...
+# Add nodes and edges...
 
-# MST hesapla
+# Calculate MST
 MST = nx.minimum_spanning_tree(G, weight='cost')
 
-# En kısa yol bul
+# Find shortest path
 path = nx.shortest_path(G, 'Istanbul', 'Diyarbakir', weight='distance')
 
-# 7. Results (Sonuçlar)
-MST Optimizasyon Sonuçları
-✅ Minimum Maliyetli Ağ Bulundu!
-   Toplam Kenar Sayısı: 7
-   Toplam Maliyet: ₺13,850
-   Tasarruf Oranı: %38,3
-En Kısa Yol Bulundu
-İstanbul → Bursa → Ankara → Kayseri → Diyarbakır
-Toplam Mesafe: 1,280 km
-Ağ Özellikleri
+# 7. Results (Output)
+MST Optimization Results
+✅ Minimum Cost Network Found!
+   Total Number of Edges: 7
+   Total Cost: ₺14,300
+   Cost Reduction Rate: 37.3%
+Shortest Path Found
+Istanbul → Ankara → Kayseri → Diyarbakir
+Total Distance: 1,290 km
+Network Characteristics
 
-Bağlantı Sayısı (Derece):
+Connection Count (Degree):
 
-İstanbul: 3 (hub merkezi)
-Ankara: 3 (ana merkezi)
-Diğerleri: 1-2 arası
-
-
-Ortalama Mesafe: 446.5 km
-Ortalama Maliyet: 2,245 ₺
+Istanbul: 3 (hub center)
+Ankara: 3 (main center)
+Others: 1-2 average
 
 
-# 8. Managerial Interpretation (Yönetimsel Yorum)
-Stratejik Öneriler
-1. Maliyet Tasarrufu
-
-MST uygulanması ile ₺8,600/dönem tasarruf sağlanabilir
-Bu, operasyonel maliyetlerin %38'ini azaltır
-Yıllık olarak ₺103,200 tasarruf potansiyeli
-
-2. Ağ Yapısı Önerisi
-
-İstanbul ve Ankara'yı hub merkez olarak kullan
-Bursa, Kayseri ve Gaziantep'i bölge merkezleri yap
-Diğer şehirleri bu merkezlere bağla
-
-3. Rota Optimizasyonu
-
-Diyarbakır yolculuğu için 1,280 km rota kullan
-Karayolu ve demiryolu kombinasyonu öner
-İzmir-Antalya arası kıyı rotasından faydalanabilir
-
-4. Kapasite Planlaması
-
-İstanbul: Günlük 1,450 paket kapasitesi (Hub)
-Ankara: Günlük 1,250 paket kapasitesi
-Diğerleri: 280-550 paket arası
-
-5. Risk Yönetimi
-
-İstanbul ve Ankara'nın önemini artırdığından yedekleme rota oluştur
-Doğal afet senaryolarında alternatif ağ planla
+Average Distance: 446.5 km
+Average Cost: ₺2,280
 
 
-# 9. How to Run the Code (Çalıştırma Talimatları)
-Sistem Gereksinimleri
+# 8. Managerial Interpretation
+Strategic Recommendations
+1. Cost Savings
 
-Python 3.7 veya üzeri
-pip paket yöneticisi
+Implementing MST can save ₺8,500 per period
+This reduces operational costs by 37.3%
+Annual savings potential: ₺102,000
 
-Kurulum Adımları
+2. Network Structure Proposal
 
-Proje klasörüne gir:
+Use Istanbul and Ankara as hub centers
+Make Bursa, Kayseri, and Gaziantep regional centers
+Connect other cities to these centers
 
+3. Route Optimization
+
+For Diyarbakir shipments, use the 1,290 km route
+Suggest highway and railway combination
+Mediterranean route benefits for Izmir-Antalya
+
+4. Capacity Planning
+
+Istanbul: Daily capacity of 1,450 packages (Hub)
+Ankara: Daily capacity of 1,250 packages
+Others: 280-550 packages average
+
+5. Risk Management
+Create backup routes due to increased importance of Istanbul and Ankara
+Plan alternative network for natural disaster scenarios
+
+
+# 9. How to Run the Code
+System Requirements
+Python 3.7 or higher
+pip package manager
+
+Installation Steps
+
+Navigate to project folder:
 bash   cd e-commerce-logistics
 
-Bağımlılıkları kur:
-
+Install dependencies:
 bash   pip install -r requirements.txt
 
-Kodları çalıştır:
-
+Run the code:
 bash   python solution.py
 
-Çıktıları kontrol et:
-
-network_visualization.png - Ağ görseli
-mst_visualization.png - Optimal ağ görseli
-Konsol çıktısında detaylı sonuçlar
-
+Check outputs:
+network_visualization.png - Network graph
+mst_visualization.png - Optimal network graph
+Detailed results in console output
 
 
-Beklenen Çıktı
+
+Expected Output
 ============================================================
-E-TİCARET LOJİSTİK AĞI OPTİMİZASYONU
-============================================================
-
-📊 Ağ Verileri:
-[9 satır, 5 sütun veri]
-
-🔗 Ağ Özellikleri:
-   Toplam Düğüm Sayısı: 8
-   Toplam Kenar Sayısı: 10
-   Ağ Bağlı mı: True
-
-✅ PROJE BAŞARIYLA TAMAMLANDI!
+E-COMMERCE LOGISTICS NETWORK OPTIMIZATION
 ============================================================
 
-# 10. References (Kaynaklar)
-Akademik Kaynaklar
+📊 Network Data:
+[10 rows, 5 columns data]
+
+🔗 Network Properties:
+   Total Number of Nodes: 8
+   Total Number of Edges: 10
+   Is Network Connected: True
+
+✅ PROJECT COMPLETED SUCCESSFULLY!
+============================================================
+
+# 10. References
+Academic Sources
 
 Dijkstra, E. W. (1959). "A note on two problems in connexion with graphs." Numerische mathematik, 1(1), 269-271.
 Kruskal, J. B. (1956). "On the shortest spanning subtree of a graph and the traveling salesman problem." Proceedings of the American Mathematical society, 7(1), 48-50.
 
-Teknik Kaynaklar
+Technical Resources
 
 NetworkX Documentation: https://networkx.org/documentation/stable/
 Python Pandas Tutorial: https://pandas.pydata.org/docs/
 Matplotlib Visualization Guide: https://matplotlib.org/stable/contents.html
 
-İşletme Yönetimi
+Business Management
 
 Chopra, S., & Meindl, P. (2016). "Supply Chain Management: Strategy, Planning, and Operation." Pearson Education.
 Simchi-Levi, D., Kaminsky, P., & Simchi-Levi, E. (2008). "Designing and Managing the Supply Chain: Concepts, Strategies and Case Studies." McGraw-Hill.
 
-MIS (Yönetim Bilişim Sistemleri) Uygulaması
+MIS (Management Information Systems) Application
 
 Laudon, K. C., & Laudon, J. P. (2020). "Management Information Systems: Managing the Digital Firm." Pearson.
 Turban, E., Volonino, L., & Wood, G. R. (2015). "Information Technology for Management: Advancing Sustainable, Profitable Business Growth."
 
 
-Proje Yapısı
+Project Structure
 e-commerce-logistics/
 │
 ├── data/
-│   └── network_data.csv              # Ağ verisi
+│   └── network_data.csv              # Network data
 │
 ├── src/
-│   └── solution.py                   # Ana Python çözümü
+│   └── solution.py                   # Main Python solution
 │
 ├── results/
-│   ├── network_visualization.png     # Orijinal ağ görseli
-│   └── mst_visualization.png         # MST görseli
+│   ├── network_visualization.png     # Original network graph
+│   └── mst_visualization.png         # MST graph
 │
 ├── notebooks/
-│   └── analysis.ipynb               # Jupyter notebook analiz
+│   └── analysis.ipynb               # Jupyter notebook analysis
 │
-├── README.md                         # Bu dosya
-├── requirements.txt                  # Python bağımlılıkları
+├── README.md                         # This file
+├── requirements.txt                  # Python dependencies
 │
 └── references/
-    └── references.md                # Detaylı kaynaklar
+    └── references.md                # Detailed references
 
-Lisans
-Bu proje eğitim amaçlı geliştirilmiştir.
-İletişim
-Sorularınız için: [E-posta adresi]
+License
+This project is developed for educational purposes.
 
-Son Güncelleme: 2026
 Versiyon: 1.0
